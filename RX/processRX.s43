@@ -1,5 +1,6 @@
 ;----------------------------------------------------------------------------------------------
 #include "msp430g2553.h"
+#include "../util/constants.h"
 ;----------------------------------------------------------------------------------------------
         NAME   PRX
         PUBLIC READ_RX
@@ -7,9 +8,156 @@
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
 READ_RX
-;----------------------------------------------------------------------------------------------
-        nop
-        ret
+;----------------------------------------------------------------------------------------------        
+                   push    DATA_BUFFER
+                   push    COUNT
+RUN_TX:           
+HOLD_ON:	   bit.b       #UCA0RXIFG,&IFG2	;RX BUFFER ESTA PRONTO
+	           jz          HOLD_ON ; 
+                   mov.b       &UCA0RXBUF,DATA_BUFFER
+                   bic.b       #UCA0RXIFG,&IFG2
+                   inc         COUNT
+                   cmp.b       #NUM_1,COUNT
+                   jeq         RECEPTION_BYTE_1
+                   cmp.b       #NUM_2,COUNT
+                   jeq         RECEPTION_BYTE_2
+                   cmp.b       #NUM_3,COUNT
+                   jeq         RECEPTION_BYTE_3
+                   cmp.b       #NUM_4,COUNT
+                   jeq         RECEPTION_BYTE_4
+                   cmp.b       #NUM_5,COUNT
+                   jeq         RECEPTION_BYTE_5
+                   cmp.b       #NUM_6,COUNT
+                   jeq         RECEPTION_BYTE_6
+                   cmp.b       #NUM_7,COUNT
+                   jeq         RECEPTION_BYTE_7
+                   cmp.b       #NUM_8,COUNT
+                   jeq         RECEPTION_BYTE_8
+                   cmp.b       #NUM_9,COUNT
+                   jeq         RECEPTION_BYTE_9
+                   cmp.b       #NUM_10,COUNT
+                   jeq         RECEPTION_BYTE_10
+                   cmp.b       #NUM_11,COUNT
+                   jeq         RECEPTION_BYTE_11
+                   cmp.b       #NUM_12,COUNT
+                   jeq         RECEPTION_BYTE_12
+                   cmp.b       #NUM_13,COUNT
+                   jeq         RECEPTION_BYTE_13
+                   cmp.b       #NUM_14,COUNT
+                   jeq         RECEPTION_BYTE_14
+                   cmp.b       #NUM_15,COUNT
+                   jeq         RECEPTION_BYTE_15
+                   cmp.b       #NUM_16,COUNT
+                   jeq         RECEPTION_BYTE_16
+                   cmp.b       #NUM_17,COUNT
+                   jeq         RECEPTION_BYTE_17
+                   cmp.b       #NUM_18,COUNT
+                   jeq         RECEPTION_BYTE_18
+                   cmp.b       #NUM_19,COUNT
+                   jeq         RECEPTION_BYTE_19
+                   cmp.b       #NUM_20,COUNT
+                   jeq         RECEPTION_BYTE_20
+                   cmp.b       #NUM_21,COUNT
+                   jeq         RECEPTION_BYTE_21
+                   cmp.b       #NUM_22,COUNT
+                   jeq         RECEPTION_BYTE_22
+                   cmp.b       #NUM_23,COUNT
+                   jeq         RECEPTION_BYTE_23
+                   cmp.b       #NUM_24,COUNT
+                   jeq         RECEPTION_BYTE_24
+                   cmp.b       #NUM_25,COUNT
+                   jeq         RECEPTION_BYTE_25
+                   cmp.b       #NUM_26,COUNT
+                   jeq         RECEPTION_BYTE_26
+                   cmp.b       #NUM_27,COUNT
+                   jeq         RECEPTION_BYTE_27
+                   cmp.b       #NUM_28,COUNT
+                   jeq         RECEPTION_BYTE_28
+                   cmp.b       #NUM_29,COUNT
+                   jeq         RECEPTION_BYTE_29
+                   cmp.b       #NUM_30,COUNT
+                   jeq         RECEPTION_BYTE_30
+                   cmp.b       #NUM_31,COUNT
+                   jeq         RECEPTION_BYTE_31
+                   cmp.b       #NUM_32,COUNT
+                   jeq         RECEPTION_BYTE_32
+                   cmp.b       #NUM_33,COUNT
+                   jeq         RECEPTION_BYTE_33
+                   jmp         END_RECEPTION    
+RECEPTION_BYTE_1:  mov.b       DATA_BUFFER,DATA1_IN
+                   jmp         END_RECEPTION 
+RECEPTION_BYTE_2:  mov.b       DATA_BUFFER,DATA2_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_3:  mov.b       DATA_BUFFER,DATA3_IN
+                   jmp         END_RECEPTION 
+RECEPTION_BYTE_4:  mov.b       DATA_BUFFER,DATA4_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_5:  mov.b       DATA_BUFFER,DATA5_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_6:  mov.b       DATA_BUFFER,DATA6_IN
+                   jmp         END_RECEPTION  
+RECEPTION_BYTE_7:  mov.b       DATA_BUFFER,DATA7_IN
+                   jmp         END_RECEPTION      
+RECEPTION_BYTE_8:  mov.b       DATA_BUFFER,DATA8_IN
+                   jmp         END_RECEPTION        
+RECEPTION_BYTE_9:  mov.b       DATA_BUFFER,DATA9_IN
+                   jmp         END_RECEPTION      
+RECEPTION_BYTE_10: mov.b       DATA_BUFFER,DATA10_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_11: mov.b       DATA_BUFFER,DATA11_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_12: mov.b       DATA_BUFFER,DATA12_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_13: mov.b       DATA_BUFFER,DATA13_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_14: mov.b       DATA_BUFFER,DATA14_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_15: mov.b       DATA_BUFFER,DATA15_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_16: mov.b       DATA_BUFFER,DATA16_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_17: mov.b       DATA_BUFFER,DATA17_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_18: mov.b       DATA_BUFFER,DATA18_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_19: mov.b       DATA_BUFFER,DATA19_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_20: mov.b       DATA_BUFFER,DATA20_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_21: mov.b       DATA_BUFFER,DATA21_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_22: mov.b       DATA_BUFFER,DATA22_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_23: mov.b       DATA_BUFFER,DATA23_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_24: mov.b       DATA_BUFFER,DATA24_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_25: mov.b       DATA_BUFFER,DATA25_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_26: mov.b       DATA_BUFFER,DATA26_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_27: mov.b       DATA_BUFFER,DATA27_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_28: mov.b       DATA_BUFFER,DATA28_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_29: mov.b       DATA_BUFFER,DATA29_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_30: mov.b       DATA_BUFFER,DATA30_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_31: mov.b       DATA_BUFFER,DATA31_IN
+                   jmp         END_RECEPTION
+RECEPTION_BYTE_32: mov.b       DATA_BUFFER,DATA32_IN
+                   jmp         END_RECEPTION 
+RECEPTION_BYTE_33: mov.b       DATA_BUFFER,DATA33_IN
+                   jmp         END_RECEPTION                     
+END_RECEPTION:     
+END_MSG:           cmp.b       #00Ah,DATA_BUFFER ; CARACTER DE FINAL DE LINHA. IDENTIFICA FINAL DA MENSAGEM
+                   jeq         CONFIG_RESPONSE         
+                   jmp         END_PROCESS   
+CONFIG_RESPONSE:   nop
+END_PROCESS:       pop         COUNT
+                   pop         DATA_BUFFER
+                   ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
         END  
