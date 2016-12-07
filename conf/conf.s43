@@ -3,15 +3,21 @@
 #include "../util/constants.h"
 ;----------------------------------------------------------------------------------------------
         NAME   CONF
-        PUBLIC CONF_SERIAL_MSP430G2553
+        PUBLIC CONF_SERIAL_MSP430G2553,CLEAR_DATA_MEM
         RSEG   CODE           
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
 CONF_SERIAL_MSP430G2553 ; INVOCA AS ROTINAS DE CONFIGURAÇÃO DA COMUNICAÇÃO UART DO mCU
 ;----------------------------------------------------------------------------------------------
-        call        #CONF_CLOCK_DEFAULT
-        call        #CONF_PORT_SEL
-        call        #CONFIG_UART
+        call         #VER_MEM
+        cmp.w        #01010h,R4
+        jnz          CONTINUE_CONFIG
+        jmp          EXIT_CONF
+CONTINUE_CONFIG:        
+        call         #CONF_CLOCK_DEFAULT
+        call         #CONF_PORT_SEL
+        call         #CONFIG_UART
+EXIT_CONF:
         ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
@@ -37,6 +43,71 @@ CONFIG_UART
         mov.b       #00002h,&UCA0MCTL
         bic.b       #UCSWRST,&UCA0CTL1 ;RESET PARA INICIALIZAÇÃO
         ret  
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+VER_MEM ; VERIFICA SE O RANGE DA MEMÓRIA QUE NECESSITA SER UTILIZADO ESTA EM USO.
+        ; CASO ESTEJA SENDO UTILIZADO DEVERÁ RETORNAR NO REGISTRADOR R4 O VALOR #01010h
+        ; OQ INDICA ERRO E NÃO POSSIBILITA A UTILIZAÇÃO DAS ROTINAS DO PACOTE.
+        ; R5 IRA CONTER O ENDERECO DE MEMORIA QUE ESTA CORROMPIDO
+;----------------------------------------------------------------------------------------------
+             push         R7
+             push         R8
+             mov.w        #00000h,R7
+             mov.w        #00000h,R8
+INIT_RANGE:  mov.w        #00208h,R7
+PVER:        mov.b        @R7,R8                  
+             tst          R8
+             jeq          CONTINUE
+STOP_ERR:    mov.w        #01010h,R4
+             mov.w        R7,R5
+             jmp          EXIT_VER_MEM 
+CONTINUE:    cmp.w        #00228h,R7
+             jnz          INCOK           
+             jmp          EXIT_VER_MEM  
+INCOK:       inc          R7
+             jmp          PVER
+EXIT_VER_MEM:
+             pop          R8
+             pop          R7
+       ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+CLEAR_DATA_MEM
+;----------------------------------------------------------------------------------------------
+       mov.b             #00000h,DATA1_IN 
+       mov.b             #00000h,DATA2_IN
+       mov.b             #00000h,DATA3_IN
+       mov.b             #00000h,DATA4_IN
+       mov.b             #00000h,DATA5_IN
+       mov.b             #00000h,DATA6_IN
+       mov.b             #00000h,DATA7_IN
+       mov.b             #00000h,DATA8_IN
+       mov.b             #00000h,DATA9_IN
+       mov.b             #00000h,DATA10_IN
+       mov.b             #00000h,DATA11_IN
+       mov.b             #00000h,DATA12_IN
+       mov.b             #00000h,DATA13_IN
+       mov.b             #00000h,DATA14_IN
+       mov.b             #00000h,DATA15_IN
+       mov.b             #00000h,DATA16_IN
+       mov.b             #00000h,DATA17_IN
+       mov.b             #00000h,DATA18_IN
+       mov.b             #00000h,DATA19_IN
+       mov.b             #00000h,DATA20_IN
+       mov.b             #00000h,DATA21_IN
+       mov.b             #00000h,DATA22_IN
+       mov.b             #00000h,DATA23_IN
+       mov.b             #00000h,DATA24_IN
+       mov.b             #00000h,DATA25_IN
+       mov.b             #00000h,DATA26_IN
+       mov.b             #00000h,DATA27_IN
+       mov.b             #00000h,DATA28_IN
+       mov.b             #00000h,DATA29_IN
+       mov.b             #00000h,DATA30_IN
+       mov.b             #00000h,DATA31_IN
+       mov.b             #00000h,DATA32_IN
+       mov.b             #00000h,DATA33_IN
+       ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
         END  
