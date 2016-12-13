@@ -3,21 +3,27 @@
 #include "../util/constants.h"
 ;----------------------------------------------------------------------------------------------
         NAME   PRX
-        PUBLIC READ_RX
+        PUBLIC READ_DATA_RX
         RSEG   CODE           
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
-READ_RX
-;----------------------------------------------------------------------------------------------        
+READ_DATA_RX
+;----------------------------------------------------------------------------------------------
                    push    DATA_BUFFER
-                   push    COUNT
+                   call    #READ_RX
+                   pop     DATA_BUFFER
+                   ret
+;----------------------------------------------------------------------------------------------                   
+;----------------------------------------------------------------------------------------------
+READ_RX
+;----------------------------------------------------------------------------------------------                
 RUN_TX:           
 HOLD_ON:	   bit.b       #UCA0RXIFG,&IFG2	;RX BUFFER ESTA PRONTO
 	           jz          HOLD_ON ; 
                    mov.b       &UCA0RXBUF,DATA_BUFFER
                    bic.b       #UCA0RXIFG,&IFG2
                    inc         COUNT
-                   cmp.b       #NUM_1,COUNT
+                   cmp.b       #00001h,COUNT
                    jeq         RECEPTION_BYTE_1
                    cmp.b       #NUM_2,COUNT
                    jeq         RECEPTION_BYTE_2
@@ -154,9 +160,8 @@ END_RECEPTION:
 END_MSG:           cmp.b       #00Ah,DATA_BUFFER ; CARACTER DE FINAL DE LINHA. IDENTIFICA FINAL DA MENSAGEM
                    jeq         CONFIG_RESPONSE         
                    jmp         END_PROCESS   
-CONFIG_RESPONSE:   nop
-END_PROCESS:       pop         COUNT
-                   pop         DATA_BUFFER
+CONFIG_RESPONSE:   mov.w       COUNT,R11
+END_PROCESS:       nop
                    ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
