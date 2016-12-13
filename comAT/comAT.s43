@@ -1,51 +1,193 @@
 ;----------------------------------------------------------------------------------------------
 #include "msp430g2553.h"
 #include "../util/constants.h"
+#include "../util/ordercomand.h"
+;----------------------------------------------------------------------------------------------
+#define    OPTIONS_COMAND          0x04u 
+#define    ORDER_TEST_RADIO        0x01u
+#define    ORDER_VER_RADIO         0x02u
+#define    ORDER_SET_DEFAULT_NAME  0x03u
+#define    ORDER_ON_RADIO          0x04u
 ;----------------------------------------------------------------------------------------------
         NAME   COMMAT
-        PUBLIC TESTE_RADIO,VERSAO_RADIO
+        PUBLIC SEND_INTERRUPT,INPUT_EXECUTE_ORDER
+        EXTERN VER_TP_COMAND
         RSEG   CODE           
 ;----------------------------------------------------------------------------------------------
-TESTE_RADIO
+TEST_RADIO_COMAND
 ;----------------------------------------------------------------------------------------------
         push      DATA_MSG
         push      COUNT
+        call      #CLEAR_DATA_MSG
         mov.w     #AT_OK,DATA_MSG
-        mov.b     #4,COUNT        
+        mov.b     #2,COUNT        
+        call      #ITER_MSG
+        pop       COUNT
+        pop       DATA_MSG
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+VER_RADIO_COMAND
+;----------------------------------------------------------------------------------------------
+        push      DATA_MSG
+        push      COUNT
+        call      #CLEAR_DATA_MSG
+        mov.w     #AT_VERSAO,DATA_MSG
+        mov.b     #0000Ch,COUNT        
+        call      #ITER_MSG
+        pop       COUNT
+        pop       DATA_MSG
+        ret 
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+SET_DEFAULT_NAME_COMAND
+;----------------------------------------------------------------------------------------------
+        push      DATA_MSG
+        push      COUNT
+        call      #CLEAR_DATA_MSG
+        mov.w     #AT_NOME,DATA_MSG
+        mov.b     #0000Ch,COUNT        
+        call      #ITER_MSG
+        pop       COUNT
+        pop       DATA_MSG
+        ret 
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+ON_RADIO_COMAND
+;----------------------------------------------------------------------------------------------
+        push      DATA_MSG
+        push      COUNT
+        call      #CLEAR_DATA_MSG
+        mov.w     #AT_START,DATA_MSG
+        mov.b     #0000Ah,COUNT        
+        call      #ITER_MSG
+        pop       COUNT
+        pop       DATA_MSG
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+RESET_RADIO_COMAND
+;----------------------------------------------------------------------------------------------
+        push      DATA_MSG
+        push      COUNT
+        call      #CLEAR_DATA_MSG
+        mov.w     #AT_RESET,DATA_MSG
+        mov.b     #0000Ah,COUNT        
+        call      #ITER_MSG
+        pop       COUNT
+        pop       DATA_MSG
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+SEND_COMMAND
+;----------------------------------------------------------------------------------------------
+TX_SEND_BAUD_AT_BUSY:       
+        bit.b       #UCBUSY,&UCA0STAT 
+        jnz         TX_SEND_BAUD_AT_BUSY                    
+        mov.b       @DATA_MSG+,UCA0TXBUF
+        bis.b       #UCA0TXIFG,&IFG2 ; LIBERA A FLAG PARA COMUNICAÇÃO   
+       // mov.b       @DATA_MSG+,R8 ; PARA TESTE
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+ITER_MSG
+;----------------------------------------------------------------------------------------------
 RUN1:   tst       COUNT
         jeq       FINAL_TESTE_RADIO
         dec       COUNT
         call      #SEND_COMMAND
         jmp       RUN1  
 FINAL_TESTE_RADIO:        
-        pop       COUNT
-        pop       DATA_MSG
         ret
+;---------------------------------------------------------------------------------------------- 
 ;----------------------------------------------------------------------------------------------
+CLEAR_DATA_MSG
 ;----------------------------------------------------------------------------------------------
-VERSAO_RADIO
-;----------------------------------------------------------------------------------------------
-        push      R4
-        mov.w     #AT_VERSAO,R4
-        call      #SEND_COMMAND
-        pop       R4
+        mov.w     #00000h,DATA_MSG 
         ret 
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
-SEND_COMMAND
+SEND_INTERRUPT ; DEVERA SER CHAMADO NA INTERRUPÇÃO DE TRANSMISSÃO 
 ;----------------------------------------------------------------------------------------------
-        //bit.b       #UCBUSY,&UCA0STAT 
-        //jnz         TX_SEND_BAUD_AT_BUSY                    
-        //mov.b       @DATA_MSG+,UCA0TXBUF
-        //bis.b       #UCA0TXIFG,&IFG2 ; LIBERA A FLAG PARA COMUNICAÇÃO   
-        mov.b       @DATA_MSG+,R8 ; EM TESTE
+        bic.b       #UCA0TXIFG,&IFG2 ; BAIXA O FLAG DE COMUNICAÇÃO
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+INPUT_EXECUTE_ORDER ; SELECIONA A ORDEM DE COMANDO INFORMADO E INICIA O PROCESSAMENTO
+;----------------------------------------------------------------------------------------------
+        call        #VER_TP_COMAND ; SEMPRE VERIFICA O TIPO DE COMANDO QUE O SOFTWARE ESTA TRABALHANDO
+        push        COUNT
+        push        DATA_BUFFER
+        push        INPUT_PARAM2
+        mov.w       #ORDER_COMAND,DATA_BUFFER       
+        mov.w       #0h,COUNT
+        tst         INPUT_PARAM1
+        jz          ORD0 
+RUN2:   inc         COUNT
+        mov.b       @DATA_BUFFER+,INPUT_PARAM2
+        cmp.b       COUNT,INPUT_PARAM1
+        jz          CS
+        jmp         RUN2
+CS:     mov.b       INPUT_PARAM2,DATA_ORDER_SOLIC
+        pop         INPUT_PARAM2
+        pop         DATA_BUFFER
+        pop         COUNT
+        call        #HUB_COMAND
+        jmp         EXIT_ORDER        
+ORD0:   pop         INPUT_PARAM2 ; AREA EM DESENVOLVIMENTO
+        pop         DATA_BUFFER
+        pop         COUNT
+        nop
+EXIT_ORDER:
+        nop
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+HUB_COMAND ;DISPARA O COMANDO SOLICITADO 
+;----------------------------------------------------------------------------------------------
+        push        INPUT_PARAM1
+        mov.b       #TEST_RADIO,INPUT_PARAM1
+        cmp.b       INPUT_PARAM1,DATA_ORDER_SOLIC
+        jz          ORDER1
+        mov.b       #VER_RADIO,INPUT_PARAM1
+        cmp.b       INPUT_PARAM1,DATA_ORDER_SOLIC
+        jz          ORDER2
+        mov.b       #SET_DEFAULT_NAME,INPUT_PARAM1
+        cmp.b       INPUT_PARAM1,DATA_ORDER_SOLIC
+        jz          ORDER3
+        mov.b       #ON_RADIO,INPUT_PARAM1
+        cmp.b       INPUT_PARAM1,DATA_ORDER_SOLIC
+        jz          ORDER4
+        jmp         EXIT_HUB
+ORDER4: nop
+        jmp         EXIT_HUB
+ORDER3: call        #SET_DEFAULT_NAME_COMAND         
+        jmp         EXIT_HUB
+ORDER2: nop
+        jmp         EXIT_HUB  
+ORDER1: nop 
+EXIT_HUB:
+        pop         INPUT_PARAM1
+        nop 
         ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------                   
+ORDER_COMAND DB          ORDER_TEST_RADIO,ORDER_VER_RADIO,ORDER_SET_DEFAULT_NAME,ORDER_ON_RADIO 
 ; ENVIA UM COMANDO AT PARA TESTAR O RADIO
-AT_OK      DB          0x41u,0x54u,0x0Du,0x0Au;AT\r\n
+AT_OK        DB          0x41u,0x54u;AT
+//AT_OK      DB          0x41u,0x54u,0x0Du,0x0Au;AT\r\n
 ; ENVIA UM COMANDO PARA VERIFICAR A VERSAO DO HARDWARE
-AT_VERSAO  DB          0x41u,0x54u,0x2Bu,0x56u,0x45u,0x52u,0x53u,0x49u,0x4Fu,0x4Eu,0x0Du,0x0A;AT+VERSION\r\n
+AT_VERSAO    DB          0x41u,0x54u,0x2Bu,0x56u,0x45u,0x52u,0x53u,0x49u,0x4Fu,0x4Eu;AT+VERSION\r\n
+; NOME DO PROJETO PARA IDENTIFICAR O HARDWARE AO PAREAR O BLUETOOTH
+AT_NOME      DB          0x41u,0x54u,0x2Bu,0x4Eu,0x41u,0x4Du,0x45u,0x65u,0x6Cu,0x42u,0x4Cu,0x54u;AT+NAMEelBLT
+; INICIALIZA AS ATIVIDADES
+AT_START     DB          0x41u,0x54u,0x2Bu,0x53u,0x54u,0x41u,0x52u,0x54u;AT+START\r\n 
+; RESETA O HARDWARE
+AT_RESET     DB          0x41u,0x54u,0x2Bu,0x52u,0x45u,0x53u,0x45u,0x54u;AT+RESET\r\n 
+
+; NOME DO PROJETO PARA IDENTIFICAR O HARDWARE AO PAREAR O BLUETOOTH
+;AT_NOME      DB          0x41u,0x54u,0x2Bu,0x4Eu,0x41u,0x4Du,0x45u,0x41u,0x41u,0x41u,0x41u,0x41u;AT+NAMEelBLT
+
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
         END  
