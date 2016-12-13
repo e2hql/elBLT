@@ -2,6 +2,10 @@
 ; RANGE DE MEMORIA NECESSÁRIO PARA A UTILIZAÇÃO DA COMUNICAÇÃO
 ; |----- 520 ----------------------------------------------- 552 ----- |
 ;----------------------------------------------------------------------------------------------
+#define          DATA_VER_HARDWARE  &0x0205
+#define          DATA_CONFIG_AT     &0x0206
+#define          DATA_ORDER_SOLIC   &0x0207
+;----------------------------------------------------------------------------------------------
 #define          DATA1_IN           &0x0208
 #define          DATA2_IN           &0x0209
 #define          DATA3_IN           &0x020A
@@ -35,6 +39,8 @@
 #define          DATA31_IN          &0x0226
 #define          DATA32_IN          &0x0227
 #define          DATA33_IN          &0x0228 
+;----------------------------------------------------------------------------------------------
+
 ;----------------------------------------------------------------------------------------------
 #define          NUM_1              0x001u
 #define          NUM_2              0x002u
@@ -73,6 +79,11 @@
 #define          DATA_MSG           R4
 #define          DATA_BUFFER        R5
 #define          COUNT              R6
+#define          INPUT_PARAM1       R7
+#define          INPUT_PARAM2       R8
 ;----------------------------------------------------------------------------------------------
-#define          FORA_DE_OPERACAO   0x1010u
+#define          NON_OPERATING      0x0Au
+;----------------------------------------------------------------------------------------------
+#define          COMANDO_AT1        0x01u //Comando sem quebra de linha
+#define          COMANDO_AT2        0x02u //Comando com quebra de linha
 ;----------------------------------------------------------------------------------------------
