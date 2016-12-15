@@ -1,1 +1,97 @@
-
+;----------------------------------------------------------------------------------------------
+; USADO PARA DAR SUPORTE AO DESENVOLVIMENTO
+;----------------------------------------------------------------------------------------------
+#include "msp430g2553.h"
+#include "../util/constants.h"
+#include "../util/ordercomand.h"
+;----------------------------------------------------------------------------------------------
+        NAME   CERTIFICATE
+        PUBLIC CONF_BT_1_3_CERTIFICATE,CERTIFICATE_MODULE_RADIO,ENABLE_TRUE_CERTIFICATE
+        EXTERN CONF_SERIAL_MSP430G2553,CLEAR_DATA_MEM,MBYTE,LBYTE  
+        RSEG   CODE           
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+CONF_BT_1_3_CERTIFICATE
+;----------------------------------------------------------------------------------------------
+        bis.b      #BIT3,&P1REN
+        bis.b      #BIT3,&P1IE
+        bis.b      #BIT3,&P1IES
+        bic.b      #BIT3,&P1IFG
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+ENABLE_TRUE_CERTIFICATE
+;----------------------------------------------------------------------------------------------
+        call     #CLEAR_DATA_MEM
+        call     #CONF_SERIAL_MSP430G2553
+        mov.b    #CERTIFICATE_H,DATA_ORDER_SOLIC
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+CERTIFICATE_MODULE_RADIO
+;----------------------------------------------------------------------------------------------
+        call      #TEST_LINVOR
+        mov.b     R4,R13
+        ret 
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+TEST_LINVOR
+;----------------------------------------------------------------------------------------------
+         cmp.b     #0000Ch,DATA_BUFFER_RX_COUNT
+         jz        RT0
+         mov.w     #00000h,R4
+         mov.b     #NOT_EXIST_VERSION,R4
+         jmp       EXIT_TEST_LINVOR          
+RT0:     mov.w     #00000h,R4
+         push      R5 ;RECEBER STRING
+         push      R6 ;CONTADOR INTERNO
+         push      R7 ;RECEBER VALOR DE DATA_IN 
+         push      R8 ;RECEBER ENDEREÇO DE DATA_IN PARA CONTAGEM DA INTERAÇÃO
+         push      R9 ;UTILIZADO PARA CONTAR CADA CARACTER CORRETO
+         push      R10 ;VAI CONTER O BYTE MAIS A DIREITA DA STRING
+         push      R11 ;VAI CONTER O BYTE MAIS A ESQUERDA DA OPERAÇÃO
+         push      R12 ;VAI CONTER O VALOR DE R5 PARA SER DESMEMBRADO 
+         mov.w     #00000h,R5
+         mov.w     #00006h,R6
+         mov.w     #00000h,R7
+         mov.w     #LINVOR1_8,R5
+         mov.w     #00208h,R8
+RT1:     tst       R6
+         jz        END_TEST_LINVOR
+         mov.b     @R8,R7
+         mov.w     @R5+,R12
+         call      #MBYTE
+         call      #LBYTE        
+         nop
+         cmp.w     R10,R7
+         jz        EQUA_1
+         jmp       END_ERR
+EQUA_1:  inc       R8
+         mov.b     @R8,R7 
+         cmp.w     R11,R7
+         jz        EQUA_2
+         jmp       END_ERR
+EQUA_2:  inc       R8
+         dec       R6
+         jmp       RT1                
+END_ERR: mov.b     #VERSION_INCOMPATIBLE,R4
+         jmp       RESTAU  
+END_TEST_LINVOR:
+         mov.b     #VERSION_HARDWARE_OK,R4  
+RESTAU:  pop       R12
+         pop       R11
+         pop       R10
+         pop       R9
+         pop       R8
+         pop       R7
+         pop       R6
+         pop       R5
+EXIT_TEST_LINVOR:        
+         ret 
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+LINVOR1_8      DB      "OKlinvorV1.8" ;RETORNO DO FIRMWARE DO MÓDULO HC-06
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+        END  
+;----------------------------------------------------------------------------------------------
