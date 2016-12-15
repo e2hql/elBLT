@@ -1,44 +1,45 @@
 ;----------------------------------------------------------------------------------------------
 ; RANGE DE MEMORIA NECESSÁRIO PARA A UTILIZAÇÃO DA COMUNICAÇÃO
-; |----- 520 ----------------------------------------------- 552 ----- |
+; |----- 516 ----------------------------------------------- 552 ----- |
 ;----------------------------------------------------------------------------------------------
-#define          DATA_VER_HARDWARE  &0x0205
-#define          DATA_CONFIG_AT     &0x0206
-#define          DATA_ORDER_SOLIC   &0x0207
+#define          DATA_BUFFER_RX_COUNT  &0x0204
+#define          DATA_VER_HARDWARE     &0x0205
+#define          DATA_CONFIG_AT        &0x0206
+#define          DATA_ORDER_SOLIC      &0x0207
 ;----------------------------------------------------------------------------------------------
-#define          DATA1_IN           &0x0208
-#define          DATA2_IN           &0x0209
-#define          DATA3_IN           &0x020A
-#define          DATA4_IN           &0x020B
-#define          DATA5_IN           &0x020C
-#define          DATA6_IN           &0x020D
-#define          DATA7_IN           &0x020E
-#define          DATA8_IN           &0x020F
-#define          DATA9_IN           &0x0210
-#define          DATA10_IN          &0x0211
-#define          DATA11_IN          &0x0212
-#define          DATA12_IN          &0x0213
-#define          DATA13_IN          &0x0214
-#define          DATA14_IN          &0x0215
-#define          DATA15_IN          &0x0216
-#define          DATA16_IN          &0x0217
-#define          DATA17_IN          &0x0218
-#define          DATA18_IN          &0x0219
-#define          DATA19_IN          &0x021A
-#define          DATA20_IN          &0x021B
-#define          DATA21_IN          &0x021C
-#define          DATA22_IN          &0x021D
-#define          DATA23_IN          &0x021E
-#define          DATA24_IN          &0x021F
-#define          DATA25_IN          &0x0220
-#define          DATA26_IN          &0x0221
-#define          DATA27_IN          &0x0222
-#define          DATA28_IN          &0x0223
-#define          DATA29_IN          &0x0224
-#define          DATA30_IN          &0x0225
-#define          DATA31_IN          &0x0226
-#define          DATA32_IN          &0x0227
-#define          DATA33_IN          &0x0228 
+#define          DATA1_IN              &0x0208
+#define          DATA2_IN              &0x0209
+#define          DATA3_IN              &0x020A
+#define          DATA4_IN              &0x020B
+#define          DATA5_IN              &0x020C
+#define          DATA6_IN              &0x020D
+#define          DATA7_IN              &0x020E
+#define          DATA8_IN              &0x020F
+#define          DATA9_IN              &0x0210
+#define          DATA10_IN             &0x0211
+#define          DATA11_IN             &0x0212
+#define          DATA12_IN             &0x0213
+#define          DATA13_IN             &0x0214
+#define          DATA14_IN             &0x0215
+#define          DATA15_IN             &0x0216
+#define          DATA16_IN             &0x0217
+#define          DATA17_IN             &0x0218
+#define          DATA18_IN             &0x0219
+#define          DATA19_IN             &0x021A
+#define          DATA20_IN             &0x021B
+#define          DATA21_IN             &0x021C
+#define          DATA22_IN             &0x021D
+#define          DATA23_IN             &0x021E
+#define          DATA24_IN             &0x021F
+#define          DATA25_IN             &0x0220
+#define          DATA26_IN             &0x0221
+#define          DATA27_IN             &0x0222
+#define          DATA28_IN             &0x0223
+#define          DATA29_IN             &0x0224
+#define          DATA30_IN             &0x0225
+#define          DATA31_IN             &0x0226
+#define          DATA32_IN             &0x0227
+#define          DATA33_IN             &0x0228 
 ;----------------------------------------------------------------------------------------------
 
 ;----------------------------------------------------------------------------------------------
@@ -82,7 +83,10 @@
 #define          INPUT_PARAM1       R7
 #define          INPUT_PARAM2       R8
 ;----------------------------------------------------------------------------------------------
-#define          NON_OPERATING      0x0Au
+#define          NON_OPERATING        0x0Au
+#define          NOT_EXIST_VERSION    0xA0u
+#define          VERSION_HARDWARE_OK  0xAAu
+#define          VERSION_INCOMPATIBLE 0xBAu
 ;----------------------------------------------------------------------------------------------
 #define          COMANDO_AT1        0x01u //Comando sem quebra de linha
 #define          COMANDO_AT2        0x02u //Comando com quebra de linha
