@@ -58,7 +58,7 @@ VER_MEM ; VERIFICA SE O RANGE DA MEMÓRIA QUE NECESSITA SER UTILIZADO ESTA EM USO
              push         R8
              mov.w        #00000h,R7
              mov.w        #00000h,R8
-INIT_RANGE:  mov.w        #00205h,R7
+INIT_RANGE:  mov.w        #00204h,R7
 PVER:        mov.b        @R7,R8                  
              tst          R8
              jeq          CONTINUE
@@ -78,6 +78,7 @@ EXIT_VER_MEM:
 ;----------------------------------------------------------------------------------------------
 CLEAR_DATA_MEM
 ;----------------------------------------------------------------------------------------------
+       mov.b             #000h,DATA_BUFFER_RX_COUNT
        mov.b             #000h,DATA_VER_HARDWARE
        mov.b             #000h,DATA_CONFIG_AT
        mov.b             #000h,DATA_ORDER_SOLIC
