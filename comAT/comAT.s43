@@ -8,9 +8,10 @@
 #define    ORDER_VER_RADIO         0x02u
 #define    ORDER_SET_DEFAULT_NAME  0x03u
 #define    ORDER_ON_RADIO          0x04u
+#define    ORDER_BAUD_9600         0x05u
 ;----------------------------------------------------------------------------------------------
         NAME   COMMAT
-        PUBLIC SEND_INTERRUPT,INPUT_EXECUTE_ORDER
+        PUBLIC SEND_INTERRUPT,INPUT_EXECUTE_ORDER,CERTIFICATE_HARDWARE_COMAND
         EXTERN VER_TP_COMAND
         RSEG   CODE           
 ;----------------------------------------------------------------------------------------------
@@ -33,7 +34,7 @@ VER_RADIO_COMAND
         push      COUNT
         call      #CLEAR_DATA_MSG
         mov.w     #AT_VERSAO,DATA_MSG
-        mov.b     #0000Ch,COUNT        
+        mov.b     #0000Ah,COUNT        
         call      #ITER_MSG
         pop       COUNT
         pop       DATA_MSG
@@ -79,6 +80,19 @@ RESET_RADIO_COMAND
         ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
+BAUD_9600_COMAND
+;----------------------------------------------------------------------------------------------
+        push      DATA_MSG
+        push      COUNT
+        call      #CLEAR_DATA_MSG
+        mov.w     #AT_9600,DATA_MSG
+        mov.b     #00008h,COUNT        
+        call      #ITER_MSG
+        pop       COUNT
+        pop       DATA_MSG
+        ret
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
 SEND_COMMAND
 ;----------------------------------------------------------------------------------------------
 TX_SEND_BAUD_AT_BUSY:       
@@ -92,6 +106,7 @@ TX_SEND_BAUD_AT_BUSY:
 ;----------------------------------------------------------------------------------------------
 ITER_MSG
 ;----------------------------------------------------------------------------------------------
+        mov.b     #000h,DATA_BUFFER_RX_COUNT 
 RUN1:   tst       COUNT
         jeq       FINAL_TESTE_RADIO
         dec       COUNT
@@ -165,25 +180,31 @@ ORDER3: call        #SET_DEFAULT_NAME_COMAND
         jmp         EXIT_HUB
 ORDER2: nop
         jmp         EXIT_HUB  
-ORDER1: nop 
+ORDER1: call        #TEST_RADIO_COMAND 
 EXIT_HUB:
         pop         INPUT_PARAM1
         nop 
         ret
 ;----------------------------------------------------------------------------------------------
-;----------------------------------------------------------------------------------------------                   
-ORDER_COMAND DB          ORDER_TEST_RADIO,ORDER_VER_RADIO,ORDER_SET_DEFAULT_NAME,ORDER_ON_RADIO 
+;----------------------------------------------------------------------------------------------
+CERTIFICATE_HARDWARE_COMAND ; VERIFICAÇÃO DE VERSAO.CHAMADA DIRETA DO HARDWARE
+;----------------------------------------------------------------------------------------------
+        call        #VER_RADIO_COMAND
+        ret
+;----------------------------------------------------------------------------------------------
+ORDER_COMAND DB          ORDER_TEST_RADIO,ORDER_VER_RADIO,ORDER_SET_DEFAULT_NAME,ORDER_ON_RADIO,ORDER_BAUD_9600 
 ; ENVIA UM COMANDO AT PARA TESTAR O RADIO
 AT_OK        DB          0x41u,0x54u;AT
-//AT_OK      DB          0x41u,0x54u,0x0Du,0x0Au;AT\r\n
 ; ENVIA UM COMANDO PARA VERIFICAR A VERSAO DO HARDWARE
-AT_VERSAO    DB          0x41u,0x54u,0x2Bu,0x56u,0x45u,0x52u,0x53u,0x49u,0x4Fu,0x4Eu;AT+VERSION\r\n
+AT_VERSAO    DB          0x41u,0x54u,0x2Bu,0x56u,0x45u,0x52u,0x53u,0x49u,0x4Fu,0x4Eu;AT+VERSION
 ; NOME DO PROJETO PARA IDENTIFICAR O HARDWARE AO PAREAR O BLUETOOTH
 AT_NOME      DB          0x41u,0x54u,0x2Bu,0x4Eu,0x41u,0x4Du,0x45u,0x65u,0x6Cu,0x42u,0x4Cu,0x54u;AT+NAMEelBLT
 ; INICIALIZA AS ATIVIDADES
 AT_START     DB          0x41u,0x54u,0x2Bu,0x53u,0x54u,0x41u,0x52u,0x54u;AT+START\r\n 
 ; RESETA O HARDWARE
 AT_RESET     DB          0x41u,0x54u,0x2Bu,0x52u,0x45u,0x53u,0x45u,0x54u;AT+RESET\r\n 
+; CONFIGURA A VELOCIDADE DE COMUNICAÇÃO EM 9600 BAUD RATE
+AT_9600      DB          0x41u,0x54u,0x2Bu,0x42u,0x41u,0x55u,0x44u,0x34u;AT+BAUD4
 
 ; NOME DO PROJETO PARA IDENTIFICAR O HARDWARE AO PAREAR O BLUETOOTH
 ;AT_NOME      DB          0x41u,0x54u,0x2Bu,0x4Eu,0x41u,0x4Du,0x45u,0x41u,0x41u,0x41u,0x41u,0x41u;AT+NAMEelBLT
