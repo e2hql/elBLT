@@ -1,93 +1,104 @@
 ;----------------------------------------------------------------------------------------------
 #include "msp430g2553.h"
 #include "../util/constants.h"
+#include "../util/ordercomand.h"
 ;----------------------------------------------------------------------------------------------
         NAME   PRX
-        PUBLIC READ_DATA_RX
+        PUBLIC READ_DATA_RX,READ_DATA_CERTIFICATE
         RSEG   CODE           
+;----------------------------------------------------------------------------------------------
+;----------------------------------------------------------------------------------------------
+READ_DATA_CERTIFICATE
+;----------------------------------------------------------------------------------------------
+                   push    DATA_BUFFER
+                   call    #READ_RX_MSG
+                   pop     DATA_BUFFER
+                   ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
 READ_DATA_RX
 ;----------------------------------------------------------------------------------------------
                    push    DATA_BUFFER
-                   call    #READ_RX
+                   mov.b   DATA_ORDER_SOLIC,R11
+                   call    #READ_RX_MSG
                    pop     DATA_BUFFER
                    ret
 ;----------------------------------------------------------------------------------------------                   
 ;----------------------------------------------------------------------------------------------
-READ_RX
+READ_RX_MSG      ; QUANDO A MENSAGEM QUE DEVERÁ SER RECEBIDA TEM FLAG INDICATIVO DE FINALIZAÇÃO
+                 ; DE MENSAGEM
 ;----------------------------------------------------------------------------------------------                
 RUN_TX:           
 HOLD_ON:	   bit.b       #UCA0RXIFG,&IFG2	;RX BUFFER ESTA PRONTO
 	           jz          HOLD_ON ; 
                    mov.b       &UCA0RXBUF,DATA_BUFFER
                    bic.b       #UCA0RXIFG,&IFG2
-                   inc         COUNT
-                   cmp.b       #00001h,COUNT
+                   inc         DATA_BUFFER_RX_COUNT
+                   cmp.b       #00001h,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_1
-                   cmp.b       #NUM_2,COUNT
+                   cmp.b       #NUM_2,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_2
-                   cmp.b       #NUM_3,COUNT
+                   cmp.b       #NUM_3,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_3
-                   cmp.b       #NUM_4,COUNT
+                   cmp.b       #NUM_4,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_4
-                   cmp.b       #NUM_5,COUNT
+                   cmp.b       #NUM_5,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_5
-                   cmp.b       #NUM_6,COUNT
+                   cmp.b       #NUM_6,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_6
-                   cmp.b       #NUM_7,COUNT
+                   cmp.b       #NUM_7,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_7
-                   cmp.b       #NUM_8,COUNT
+                   cmp.b       #NUM_8,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_8
-                   cmp.b       #NUM_9,COUNT
+                   cmp.b       #NUM_9,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_9
-                   cmp.b       #NUM_10,COUNT
+                   cmp.b       #NUM_10,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_10
-                   cmp.b       #NUM_11,COUNT
+                   cmp.b       #NUM_11,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_11
-                   cmp.b       #NUM_12,COUNT
+                   cmp.b       #NUM_12,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_12
-                   cmp.b       #NUM_13,COUNT
+                   cmp.b       #NUM_13,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_13
-                   cmp.b       #NUM_14,COUNT
+                   cmp.b       #NUM_14,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_14
-                   cmp.b       #NUM_15,COUNT
+                   cmp.b       #NUM_15,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_15
-                   cmp.b       #NUM_16,COUNT
+                   cmp.b       #NUM_16,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_16
-                   cmp.b       #NUM_17,COUNT
+                   cmp.b       #NUM_17,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_17
-                   cmp.b       #NUM_18,COUNT
+                   cmp.b       #NUM_18,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_18
-                   cmp.b       #NUM_19,COUNT
+                   cmp.b       #NUM_19,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_19
-                   cmp.b       #NUM_20,COUNT
+                   cmp.b       #NUM_20,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_20
-                   cmp.b       #NUM_21,COUNT
+                   cmp.b       #NUM_21,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_21
-                   cmp.b       #NUM_22,COUNT
+                   cmp.b       #NUM_22,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_22
-                   cmp.b       #NUM_23,COUNT
+                   cmp.b       #NUM_23,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_23
-                   cmp.b       #NUM_24,COUNT
+                   cmp.b       #NUM_24,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_24
-                   cmp.b       #NUM_25,COUNT
+                   cmp.b       #NUM_25,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_25
-                   cmp.b       #NUM_26,COUNT
+                   cmp.b       #NUM_26,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_26
-                   cmp.b       #NUM_27,COUNT
+                   cmp.b       #NUM_27,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_27
-                   cmp.b       #NUM_28,COUNT
+                   cmp.b       #NUM_28,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_28
-                   cmp.b       #NUM_29,COUNT
+                   cmp.b       #NUM_29,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_29
-                   cmp.b       #NUM_30,COUNT
+                   cmp.b       #NUM_30,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_30
-                   cmp.b       #NUM_31,COUNT
+                   cmp.b       #NUM_31,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_31
-                   cmp.b       #NUM_32,COUNT
+                   cmp.b       #NUM_32,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_32
-                   cmp.b       #NUM_33,COUNT
+                   cmp.b       #NUM_33,DATA_BUFFER_RX_COUNT
                    jeq         RECEPTION_BYTE_33
                    jmp         END_RECEPTION    
 RECEPTION_BYTE_1:  mov.b       DATA_BUFFER,DATA1_IN
@@ -157,10 +168,12 @@ RECEPTION_BYTE_32: mov.b       DATA_BUFFER,DATA32_IN
 RECEPTION_BYTE_33: mov.b       DATA_BUFFER,DATA33_IN
                    jmp         END_RECEPTION                     
 END_RECEPTION:     
+VER_OPER_TYPE:     cmp.b       #CERTIFICATE_H,DATA_ORDER_SOLIC
+                   jz          END_PROCESS
 END_MSG:           cmp.b       #00Ah,DATA_BUFFER ; CARACTER DE FINAL DE LINHA. IDENTIFICA FINAL DA MENSAGEM
                    jeq         CONFIG_RESPONSE         
                    jmp         END_PROCESS   
-CONFIG_RESPONSE:   mov.w       COUNT,R11
+CONFIG_RESPONSE:   mov.w       DATA_BUFFER_RX_COUNT,R11
 END_PROCESS:       nop
                    ret
 ;----------------------------------------------------------------------------------------------
