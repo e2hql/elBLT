@@ -18,6 +18,7 @@ CONTINUE_CONFIG:
         call         #CONF_CLOCK_DEFAULT
         call         #CONF_PORT_SEL
         call         #CONFIG_UART
+        mov.b        #OK_TRX,DATA_STAT_TRX
 EXIT_CONF:
         ret
 ;----------------------------------------------------------------------------------------------
@@ -59,7 +60,7 @@ VER_MEM ; VERIFICA SE O RANGE DA MEMÓRIA QUE NECESSITA SER UTILIZADO ESTA EM USO
              push         R8
              mov.w        #00000h,R7
              mov.w        #00000h,R8
-INIT_RANGE:  mov.w        #00203h,R7
+INIT_RANGE:  mov.w        #00202h,R7
 PVER:        mov.b        @R7,R8                  
              tst          R8
              jeq          CONTINUE
@@ -79,6 +80,7 @@ EXIT_VER_MEM:
 ;----------------------------------------------------------------------------------------------
 CLEAR_DATA_MEM
 ;----------------------------------------------------------------------------------------------
+       mov.b             #000h,DATA_STAT_TRX
        mov.b             #000h,DATA_LIMIT_IN
        mov.b             #000h,DATA_BUFFER_RX_COUNT
        mov.b             #000h,DATA_VER_HARDWARE
