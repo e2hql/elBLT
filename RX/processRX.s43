@@ -19,8 +19,11 @@ READ_DATA_CERTIFICATE
 READ_DATA_RX
 ;----------------------------------------------------------------------------------------------
                    push    DATA_BUFFER
-                   mov.b   DATA_ORDER_SOLIC,R11
-                   call    #READ_RX_MSG
+                   cmp.b   #TEST_RADIO,DATA_ORDER_SOLIC
+                   jz      HR_2 ; TESTE DE HARDWARE RETORNA 2 CARACTERES DE RESPOSTA
+                   jmp     RRDRX
+HR_2:              mov.b   #002h,DATA_LIMIT_IN                   
+RRDRX:             call    #READ_RX_MSG
                    pop     DATA_BUFFER
                    ret
 ;----------------------------------------------------------------------------------------------                   
@@ -171,9 +174,14 @@ END_RECEPTION:
 VER_OPER_TYPE:     cmp.b       #CERTIFICATE_H,DATA_ORDER_SOLIC
                    jz          END_PROCESS
 END_MSG:           cmp.b       #00Ah,DATA_BUFFER ; CARACTER DE FINAL DE LINHA. IDENTIFICA FINAL DA MENSAGEM
-                   jeq         CONFIG_RESPONSE         
-                   jmp         END_PROCESS   
-CONFIG_RESPONSE:   mov.w       DATA_BUFFER_RX_COUNT,R11
+                   jz          CONFIG_RESPONSE_MSG            
+CONFIG_RESPONSE:   cmp.b       DATA_LIMIT_IN,DATA_BUFFER_RX_COUNT
+                   jz          END_RX_P
+                   jmp         END_PROCESS    
+END_RX_P:          nop ; ADICIONAR AQUI ALGUM CONTROLE QUE INDIQUE QUE FINALIZOU A COMUNICAÇÃO
+                   jmp         END_PROCESS  
+CONFIG_RESPONSE_MSG: ; AINDA NECESSARIO IMPLEMENTACAO
+                   nop
 END_PROCESS:       nop
                    ret
 ;----------------------------------------------------------------------------------------------
