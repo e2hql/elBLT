@@ -18,13 +18,22 @@ READ_DATA_CERTIFICATE
 ;----------------------------------------------------------------------------------------------
 READ_DATA_RX
 ;----------------------------------------------------------------------------------------------
+                   mov.b   #NOT_TRX,DATA_STAT_TRX
                    push    DATA_BUFFER
+                   cmp.b   #COMANDO_AT2,DATA_CONFIG_AT
+                   jz      RRDRX2
                    cmp.b   #TEST_RADIO,DATA_ORDER_SOLIC
                    jz      HR_2 ; TESTE DE HARDWARE RETORNA 2 CARACTERES DE RESPOSTA
+                   cmp.b   #SET_DEFAULT_NAME,DATA_ORDER_SOLIC
+                   jz      HR_9 ; TESTE DE HARDWARE RETORNA 9 CARACTERES DE RESPOSTA
+                   jmp     RRDRX ; IMPLEMENTAR OUTRAS VERIFICAÇÕES    
+HR_9:              mov.b   #009h,DATA_LIMIT_IN
                    jmp     RRDRX
 HR_2:              mov.b   #002h,DATA_LIMIT_IN                   
 RRDRX:             call    #READ_RX_MSG
-                   pop     DATA_BUFFER
+                   jmp     END_DT_RX
+RRDRX2:            call    #READ_RX_MSG
+END_DT_RX:         pop     DATA_BUFFER
                    ret
 ;----------------------------------------------------------------------------------------------                   
 ;----------------------------------------------------------------------------------------------
@@ -173,17 +182,19 @@ RECEPTION_BYTE_33: mov.b       DATA_BUFFER,DATA33_IN
 END_RECEPTION:     
 VER_OPER_TYPE:     cmp.b       #CERTIFICATE_H,DATA_ORDER_SOLIC
                    jz          END_PROCESS
-END_MSG:           cmp.b       #00Ah,DATA_BUFFER ; CARACTER DE FINAL DE LINHA. IDENTIFICA FINAL DA MENSAGEM
-                   jz          CONFIG_RESPONSE_MSG            
+                   cmp.b       #COMANDO_AT2,DATA_CONFIG_AT
+                   jz          VER_END_LINE
 CONFIG_RESPONSE:   cmp.b       DATA_LIMIT_IN,DATA_BUFFER_RX_COUNT
                    jz          END_RX_P
                    jmp         END_PROCESS    
-END_RX_P:          nop ; ADICIONAR AQUI ALGUM CONTROLE QUE INDIQUE QUE FINALIZOU A COMUNICAÇÃO
-                   jmp         END_PROCESS  
-CONFIG_RESPONSE_MSG: ; AINDA NECESSARIO IMPLEMENTACAO
-                   nop
-END_PROCESS:       nop
-                   ret
+END_RX_P:          mov.b       #OK_TRX,DATA_STAT_TRX ; ADICIONAR AQUI ALGUM CONTROLE QUE INDIQUE QUE FINALIZOU A COMUNICAÇÃO
+                   jmp         END_PROCESS
+VER_END_LINE:      cmp.b       #00Ah,DATA_BUFFER ; CARACTER DE FINAL DE LINHA. IDENTIFICA FINAL DA MENSAGEM
+                   jz          CONFIG_RESPONSE_L
+                   jmp         END_PROCESS
+CONFIG_RESPONSE_L: 
+                   nop; AINDA NECESSARIO IMPLEMENTACAO                   
+END_PROCESS:       ret
 ;----------------------------------------------------------------------------------------------
 ;----------------------------------------------------------------------------------------------
         END  
